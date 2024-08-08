@@ -10,6 +10,33 @@
 
 A Python 3.6+ package to manage [Zenodo](https://zenodo.org/) repositories.
 
+
+### Dev Setup
+
+#### Step 1: Clone the repository
+```
+git clone https://github.com/lgloege/zenodopy.git
+cd zenodopy
+```
+
+#### Step 2: Create and activate a conda environment
+```
+conda create --name zenopy python=3.9
+conda activate zenopy
+```
+
+#### Step 3: Install the dependencies
+```
+pip install -r requirements.txt
+```
+
+#### Step 4: Install the package in editable mode
+```
+pip install -e .
+```
+![Screenshot](assets/img/devsetup.png)
+
+
 ### Functions Implemented
 
 - `.create_project()`: create a new project
@@ -18,66 +45,6 @@ A Python 3.6+ package to manage [Zenodo](https://zenodo.org/) repositories.
 - `.delete_file()`: permanently removes a file from a project
 - `.get_urls_from_doi()`: returns the files urls for a given doi
 
-Installing
-----------
-
-### PyPi
-
-```sh
-pip install zenodopy==0.3.0
-```
-
-### GitHub
-
-```sh
-pip install -e git+https://github.com/lgloege/zenodopy.git#egg=zenodopy
-```
-
-Using the Package
------------------
-
-1. **Create a Zenodo access token** by first logging into your account and clicking on your username in the top right corner. Navigate to "Applications" and then "+new token" under "Personal access tokens".  Keep this window open while you proceed to step 2 because **the token is only displayed once**. Note that Sandbox.zenodo is used for testing and zenodo for production. If you want to use both, create for each a token as desribed above.
-2. **Store the token** in `~/.zenodo_token` using the following command.
-
-```sh
-# zenodo token
- { echo 'ACCESS_TOKEN: your_access_token_here' } > ~/.zenodo_token
-
-# sandbox.zenodo token
- { echo 'ACCESS_TOKEN-sandbox: your_access_token_here' } > ~/.zenodo_token
-```
-
-3. **start using the `zenodopy` package**
-
-```python
-import zenodopy
-
-# always start by creating a Client object
-zeno = zenodopy.Client(sandbox=True)
-
-# list project id's associated to zenodo account
-zeno.list_projects
-
-# create a project
-zeno.create_project(title="test_project", upload_type="other")
-# your zeno object now points to this newly created project
-
-# create a file to upload
-with open("~/test_file.txt", "w+") as f:
-    f.write("Hello from zenodopy")
-
-# upload file to zenodo
-zeno.upload_file("~/test.file.txt")
-
-# list files of project
-zeno.list_files
-
-# set project to other project id's
-zeno.set_project("<id>")
-
-# delete project
-zeno._delete_project(dep_id="<id>")
-```
 
 Notes
 -----
