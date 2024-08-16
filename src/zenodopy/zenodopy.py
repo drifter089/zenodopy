@@ -6,6 +6,7 @@ import requests
 import warnings
 import tarfile
 import zipfile
+from datetime import datetime
 
 
 def validate_url(url):
@@ -379,17 +380,18 @@ class Client(object):
                           headers={'Content-Type': 'application/json'})
 
         if r.ok:
-            deposition_id = r.json()['id']
-
-            self.change_metadata(dep_id=deposition_id,
-                                 title=title,
-                                 upload_type=upload_type,
-                                 description=description,
-                                 )
-
+            
             self.deposition_id = r.json()['id']
             self.bucket = r.json()['links']['bucket']
             self.title = title
+            
+            self.change_metadata(
+                                 title=title,
+                                 upload_type=upload_type,
+                                 description=description,
+                                 json_file_path="/home/akshat/zenodopy/.zenodo.json"
+                        )
+                
         else:
             print("** Project not created, something went wrong. Check that your ACCESS_TOKEN is in ~/.zenodo_token ")
 
@@ -406,11 +408,31 @@ class Client(object):
         else:
             print(f' ** Deposition ID: {dep_id} does not exist in your projects  ** ')
 
-    def change_metadata(self, dep_id=None,
+    def new_version(self):
+        if self.deposit['submitted'] == False or "latest_draft" in self.deposit[
+                "links"]:
+            raise ValueError("The deposit has an unpublished version, "
+                             "I can not add a new one. "
+                             "Please remove or publish the existing version, "
+                             "then run again.")
+        req_url = "/{}/actions/newversion"
+        r = self._request("POST", req_url.format(self.deposition_id))
+        if "links" in r:
+            if "latest_draft" in r["links"]:
+                self.latest = Path(r["links"]["latest_draft"]).name
+            self.deposit = r
+        return r
+
+    def publish_latest_draft(self):
+        req_url = "/{}/actions/publish"
+        return self._request("POST", req_url.format(self.latest))
+
+    def change_metadata(self,
                         title=None,
                         upload_type=None,
                         description=None,
                         creator=None,
+                        json_file_path=None,
                         **kwargs
                         ):
         """change projects metadata
@@ -451,17 +473,24 @@ class Client(object):
         }
         # update metadata with a new metadata dictionary
         data.update(kwargs) 
+        
+        if json_file_path:
+        # Load metadata from the provided JSON file
+            with open(json_file_path, 'r') as json_file:
+                file_data = json.load(json_file)
+        
+        file_data["metadata"]["publication_date"]=datetime.now().strftime('%Y-%m-%d')
 
-        r = requests.put(f"{self._endpoint}/deposit/depositions/{dep_id}",
+        r = requests.put(f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
                          auth=self._bearer_auth,
-                         data=json.dumps(data),
+                         data=json.dumps(file_data),
                          headers={'Content-Type': 'application/json'})
 
         if r.ok:
             return r.json()
         else:
             return r.raise_for_status()
-
+         
     def upload_file(self, file_path=None, publish=False):
         """upload a file to a project
 
@@ -627,6 +656,7 @@ class Client(object):
         # parse current project to the draft deposition
         new_dep_id = r.json()['links']['latest_draft'].split('/')[-1]
         self.set_project(new_dep_id)
+        self.change_metadata(json_file_path="/home/akshat/zenodopy/.zenodo.json")
 
         # invoke upload funcions
         if not source:
@@ -655,7 +685,6 @@ class Client(object):
 
     def download_file(self, filename=None, dst_path=None):
         """download a file from project
-
         Args:
             filename (str): name of the file to download
             dst_path (str): destination path to download the data (default is current directory)
