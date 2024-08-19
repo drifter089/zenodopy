@@ -448,8 +448,16 @@ class Client(object):
             dict: dictionary with new metadata
         """
 
+        if json_file_path is None:
+            print("You need to supply a path")
+
+        if not Path(os.path.expanduser(json_file_path)).exists():
+            print(
+                f"{json_file_path} does not exist. Please check you entered the correct path"
+            )
+
         if json_file_path:
-            with open(json_file_path, "r") as json_file:
+            with open(json_file_path, "rb") as json_file:
                 file_data = json.load(json_file)
 
         # if upload_type is None:
