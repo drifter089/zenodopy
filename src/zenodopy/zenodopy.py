@@ -16,12 +16,14 @@ def validate_url(url):
         bool: True is URL is acceptable False if not acceptable
     """
     regex = re.compile(
-        r'^(?:http|ftp)s?://'  # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        r"^(?:http|ftp)s?://"  # http:// or https://
+        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
+        r"localhost|"  # localhost...
+        r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
+        r"(?::\d+)?"  # optional port
+        r"(?:/?|[/?]\S+)$",
+        re.IGNORECASE,
+    )
 
     return re.match(regex, url) is not None
 
@@ -45,9 +47,10 @@ def make_zipfile(path, ziph):
     # ziph is zipfile handle
     for root, dirs, files in os.walk(path):
         for file in files:
-            ziph.write(os.path.join(root, file),
-                       os.path.relpath(os.path.join(root, file),
-                                       os.path.join(path, '..')))
+            ziph.write(
+                os.path.join(root, file),
+                os.path.relpath(os.path.join(root, file), os.path.join(path, "..")),
+            )
 
 
 class BearerAuth(requests.auth.AuthBase):
@@ -79,7 +82,9 @@ class Client(object):
         ```
     """
 
-    def __init__(self, title=None, bucket=None, deposition_id=None, sandbox=None, token=None):
+    def __init__(
+        self, title=None, bucket=None, deposition_id=None, sandbox=None, token=None
+    ):
         """initialization method"""
         if sandbox:
             self._endpoint = "https://sandbox.zenodo.org/api"
@@ -121,7 +126,7 @@ class Client(object):
             "Software",
             "Lesson",
             "Physical object",
-            "Other"
+            "Other",
         ]
 
     @staticmethod
@@ -161,16 +166,24 @@ class Client(object):
             str: ACCESS_TOKEN to connect to web3 storage
         """
         if self.sandbox:
-            dotrc = os.environ.get("ACCESS_TOKEN-sandbox", os.path.expanduser("~/.zenodo_token"))
+            dotrc = os.environ.get(
+                "ACCESS_TOKEN-sandbox", os.path.expanduser("~/.zenodo_token")
+            )
         else:
-            dotrc = os.environ.get("ACCESS_TOKEN", os.path.expanduser("~/.zenodo_token"))
+            dotrc = os.environ.get(
+                "ACCESS_TOKEN", os.path.expanduser("~/.zenodo_token")
+            )
 
         if os.path.exists(dotrc):
             config = self._read_config(dotrc)
-            key = config.get("ACCESS_TOKEN-sandbox") if self.sandbox else config.get("ACCESS_TOKEN")
+            key = (
+                config.get("ACCESS_TOKEN-sandbox")
+                if self.sandbox
+                else config.get("ACCESS_TOKEN")
+            )
             return key
         else:
-            print(' ** No token was found, check your ~/.zenodo_token file ** ')
+            print(" ** No token was found, check your ~/.zenodo_token file ** ")
 
     def _get_depositions(self):
         """gets the current project deposition
@@ -181,8 +194,9 @@ class Client(object):
             dict: dictionary containing project details
         """
         # get request, returns our response
-        r = requests.get(f"{self._endpoint}/deposit/depositions",
-                         auth=self._bearer_auth)
+        r = requests.get(
+            f"{self._endpoint}/deposit/depositions", auth=self._bearer_auth
+        )
         if r.ok:
             return r.json()
         else:
@@ -201,8 +215,9 @@ class Client(object):
         """
         # get request, returns our response
         # if dep_id is not None:
-        r = requests.get(f"{self._endpoint}/deposit/depositions/{dep_id}",
-                         auth=self._bearer_auth)
+        r = requests.get(
+            f"{self._endpoint}/deposit/depositions/{dep_id}", auth=self._bearer_auth
+        )
 
         if r.ok:
             return r.json()
@@ -218,8 +233,10 @@ class Client(object):
             dict: dictionary containing project details
         """
         # get request, returns our response
-        r = requests.get(f"{self._endpoint}/deposit/depositions/{self.deposition_id}/files",
-                         auth=self._bearer_auth)
+        r = requests.get(
+            f"{self._endpoint}/deposit/depositions/{self.deposition_id}/files",
+            auth=self._bearer_auth,
+        )
 
         if r.ok:
             return r.json()
@@ -241,11 +258,12 @@ class Client(object):
         dep_id = dic[title] if dic is not None else None
 
         # get request, returns our response, this the records metadata
-        r = requests.get(f"{self._endpoint}/deposit/depositions/{dep_id}",
-                         auth=self._bearer_auth)
+        r = requests.get(
+            f"{self._endpoint}/deposit/depositions/{dep_id}", auth=self._bearer_auth
+        )
 
         if r.ok:
-            return r.json()['links']['bucket']
+            return r.json()["links"]["bucket"]
         else:
             return r.raise_for_status()
 
@@ -261,11 +279,12 @@ class Client(object):
             str: the bucket URL to upload files to
         """
         # get request, returns our response
-        r = requests.get(f"{self._endpoint}/deposit/depositions/{dep_id}",
-                         auth=self._bearer_auth)
+        r = requests.get(
+            f"{self._endpoint}/deposit/depositions/{dep_id}", auth=self._bearer_auth
+        )
 
         if r.ok:
-            return r.json()['links']['bucket']
+            return r.json()["links"]["bucket"]
         else:
             return r.raise_for_status()
 
@@ -283,10 +302,9 @@ class Client(object):
     # ---------------------------------------------
     @property
     def setup_instructions(self):
-        """instructions to setup zenodoPy
-        """
+        """instructions to setup zenodoPy"""
         print(
-            '''
+            """
             # ==============================================
             # Follow these steps to setup zenodopy
             # ==============================================
@@ -307,7 +325,7 @@ class Client(object):
                 import zenodopy
                 zeno = zenodopy.Client()
                 zeno._token # this should display your ACCESS_TOKEN
-            '''
+            """
         )
 
     @property
@@ -319,20 +337,22 @@ class Client(object):
         tmp = self._get_depositions()
 
         if isinstance(tmp, list):
-            print('Project Name ---- ID ---- Status ---- Latest Published ID')
-            print('---------------------------------------------------------')
+            print("Project Name ---- ID ---- Status ---- Latest Published ID")
+            print("---------------------------------------------------------")
             for file in tmp:
                 status = {}  # just to rename the file outputs and deal with exceptions
-                if file['submitted']:
-                    status['submitted'] = 'published'
+                if file["submitted"]:
+                    status["submitted"] = "published"
                 else:
-                    status['submitted'] = 'unpublished'
-                
-                status["latest"] = self._get_latest_record(file['id'])
-                    
-                print(f"{file['title']} ---- {file['id']} ---- {status['submitted']} ---- {status['latest']}")
+                    status["submitted"] = "unpublished"
+
+                status["latest"] = self._get_latest_record(file["id"])
+
+                print(
+                    f"{file['title']} ---- {file['id']} ---- {status['submitted']} ---- {status['latest']}"
+                )
         else:
-            print(' ** need to setup ~/.zenodo_token file ** ')
+            print(" ** need to setup ~/.zenodo_token file ** ")
 
     @property
     def list_files(self):
@@ -343,12 +363,14 @@ class Client(object):
         dep_id = self.deposition_id
         dep = self._get_depositions_by_id(dep_id)
         if dep is not None:
-            print('Files')
-            print('------------------------')
-            for file in dep['files']:
-                print(file['filename'])
+            print("Files")
+            print("------------------------")
+            for file in dep["files"]:
+                print(file["filename"])
         else:
-            print(" ** the object is not pointing to a project. Use either .set_project() or .create_project() before listing files ** ")
+            print(
+                " ** the object is not pointing to a project. Use either .set_project() or .create_project() before listing files ** "
+            )
             # except UserWarning:
             # warnings.warn("The object is not pointing to a project. Either create a project or explicity set the project'", UserWarning)
 
@@ -367,19 +389,16 @@ class Client(object):
             description (str, optional): new description
         """
 
-        if upload_type is None:
-            upload_types = self._get_upload_types()
-            warnings.warn(f"upload_type not set, so defaulted to 'other', possible choices include {upload_types}",
-                          UserWarning)
-            upload_type = 'other'
-
         # get request, returns our response
-        r = requests.post(f"{self._endpoint}/deposit/depositions",
-                          auth=self._bearer_auth,
-                          data=json.dumps({}),
-                          headers={'Content-Type': 'application/json'})
+        r = requests.post(
+            f"{self._endpoint}/deposit/depositions",
+            auth=self._bearer_auth,
+            data=json.dumps({}),
+            headers={"Content-Type": "application/json"},
+        )
 
         if r.ok:
+<<<<<<< Updated upstream
             
             self.deposition_id = r.json()['id']
             self.bucket = r.json()['links']['bucket']
@@ -392,22 +411,36 @@ class Client(object):
                                  json_file_path="/home/akshat/zenodopy/.zenodo.json"
                         )
                 
+=======
+
+            self.deposition_id = r.json()["id"]
+            self.bucket = r.json()["links"]["bucket"]
+            self.title = title
+
+            self.change_metadata(
+                json_file_path="/home/akshat/zenodopy/.zenodo.json",
+            )
+
+>>>>>>> Stashed changes
         else:
-            print("** Project not created, something went wrong. Check that your ACCESS_TOKEN is in ~/.zenodo_token ")
+            print(
+                "** Project not created, something went wrong. Check that your ACCESS_TOKEN is in ~/.zenodo_token "
+            )
 
     def set_project(self, dep_id=None):
-        '''set the project by id'''
+        """set the project by id"""
         projects = self._get_depositions()
 
         if projects is not None:
-            project_list = [d for d in projects if d['id'] == int(dep_id)]
+            project_list = [d for d in projects if d["id"] == int(dep_id)]
             if len(project_list) > 0:
-                self.title = project_list[0]['title']
+                self.title = project_list[0]["title"]
                 self.bucket = self._get_bucket_by_id(dep_id)
                 self.deposition_id = dep_id
         else:
-            print(f' ** Deposition ID: {dep_id} does not exist in your projects  ** ')
+            print(f" ** Deposition ID: {dep_id} does not exist in your projects  ** ")
 
+<<<<<<< Updated upstream
     def new_version(self):
         if self.deposit['submitted'] == False or "latest_draft" in self.deposit[
                 "links"]:
@@ -435,6 +468,9 @@ class Client(object):
                         json_file_path=None,
                         **kwargs
                         ):
+=======
+    def change_metadata(self, json_file_path=None):
+>>>>>>> Stashed changes
         """change projects metadata
 
         ** warning **
@@ -454,15 +490,12 @@ class Client(object):
         Returns:
             dict: dictionary with new metadata
         """
-        if upload_type is None:
-            upload_type = 'other'
 
-        if description is None:
-            description = "description goes here"
-        
-        if creator is None:
-            creator = "creator goes here"
+        if json_file_path:
+            with open(json_file_path, "r") as json_file:
+                file_data = json.load(json_file)
 
+<<<<<<< Updated upstream
         data = {
             "metadata": {
                 "title": f"{title}",
@@ -485,6 +518,24 @@ class Client(object):
                          auth=self._bearer_auth,
                          data=json.dumps(file_data),
                          headers={'Content-Type': 'application/json'})
+=======
+        # if upload_type is None:
+        #     upload_types = self._get_upload_types()
+        #     warnings.warn(
+        #         f"upload_type not set, so defaulted to 'other', possible choices include {upload_types}",
+        #         UserWarning,
+        #     )
+        #     upload_type = "other"
+
+        file_data["metadata"]["publication_date"] = datetime.now().strftime("%Y-%m-%d")
+
+        r = requests.put(
+            f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
+            auth=self._bearer_auth,
+            data=json.dumps(file_data),
+            headers={"Content-Type": "application/json"},
+        )
+>>>>>>> Stashed changes
 
         if r.ok:
             return r.json()
@@ -502,31 +553,41 @@ class Client(object):
             print("You need to supply a path")
 
         if not Path(os.path.expanduser(file_path)).exists():
-            print(f"{file_path} does not exist. Please check you entered the correct path")
+            print(
+                f"{file_path} does not exist. Please check you entered the correct path"
+            )
 
         if self.bucket is None:
-            print("You need to create a project with zeno.create_project() "
-                  "or set a project zeno.set_project() before uploading a file") 
+            print(
+                "You need to create a project with zeno.create_project() "
+                "or set a project zeno.set_project() before uploading a file"
+            )
         else:
             bucket_link = self.bucket
 
             with open(file_path, "rb") as fp:
                 # text after last '/' is the filename
-                filename = file_path.split('/')[-1]
-                r = requests.put(f"{bucket_link}/{filename}",
-                                 auth=self._bearer_auth,
-                                 data=fp,)
+                filename = file_path.split("/")[-1]
+                r = requests.put(
+                    f"{bucket_link}/{filename}",
+                    auth=self._bearer_auth,
+                    data=fp,
+                )
 
-                print(f"{file_path} successfully uploaded!") if r.ok else print("Oh no! something went wrong")
-            
+                (
+                    print(f"{file_path} successfully uploaded!")
+                    if r.ok
+                    else print("Oh no! something went wrong")
+                )
+
             if publish:
                 return self.publish()
 
     def upload_zip(self, source_dir=None, output_file=None, publish=False):
         """upload a directory to a project as zip
 
-        This will: 
-            1. zip the directory, 
+        This will:
+            1. zip the directory,
             2. upload the zip directory to your project
             3. remove the zip file from your local machine
 
@@ -543,7 +604,7 @@ class Client(object):
             raise FileNotFoundError(f"{source_dir} does not exist")
 
         # acceptable extensions for outputfile
-        acceptable_extensions = ['.zip']
+        acceptable_extensions = [".zip"]
 
         # use name of source_dir for output_file if none is included
         if not output_file:
@@ -552,13 +613,13 @@ class Client(object):
         else:
             output_file = os.path.expanduser(output_file)
             output_obj = Path(output_file)
-            extension = ''.join(output_obj.suffixes)  # gets extension like .tar.gz
+            extension = "".join(output_obj.suffixes)  # gets extension like .tar.gz
             # make sure extension is acceptable
             if extension not in acceptable_extensions:
                 raise Exception(f"Extension must be in {acceptable_extensions}")
             # add an extension if not included
             if not extension:
-                output_file = os.path.expanduser(output_file + '.zip')
+                output_file = os.path.expanduser(output_file + ".zip")
                 output_obj = Path(output_file)
 
         # check to make sure outputfile doesn't already exist
@@ -567,11 +628,11 @@ class Client(object):
 
         # create tar directory if does not exist
         if output_obj.parent.exists():
-            with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zipf:
                 make_zipfile(source_dir, zipf)
         else:
             os.makedirs(output_obj.parent)
-            with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zipf:
                 make_zipfile(source_dir, zipf)
 
         # upload the file
@@ -583,8 +644,8 @@ class Client(object):
     def upload_tar(self, source_dir=None, output_file=None, publish=False):
         """upload a directory to a project
 
-        This will: 
-            1. tar the directory, 
+        This will:
+            1. tar the directory,
             2. upload the tarred directory to your project
             3. remove the tar file from your local machine
 
@@ -604,7 +665,7 @@ class Client(object):
             raise FileNotFoundError(f"{source_dir} does not exist")
 
         # acceptable extensions for outputfile
-        acceptable_extensions = ['.tar.gz']
+        acceptable_extensions = [".tar.gz"]
 
         # use name of source_dir for output_file if none is included
         if not output_file:
@@ -613,13 +674,13 @@ class Client(object):
         else:
             output_file = os.path.expanduser(output_file)
             output_obj = Path(output_file)
-            extension = ''.join(output_obj.suffixes)  # gets extension like .tar.gz
+            extension = "".join(output_obj.suffixes)  # gets extension like .tar.gz
             # make sure extension is acceptable
             if extension not in acceptable_extensions:
                 raise Exception(f"Extension must be in {acceptable_extensions}")
             # add an extension if not included
             if not extension:
-                output_file = os.path.expanduser(output_file + '.tar.gz')
+                output_file = os.path.expanduser(output_file + ".tar.gz")
                 output_obj = Path(output_file)
 
         # check to make sure outputfile doesn't already exist
@@ -649,36 +710,37 @@ class Client(object):
             publish (bool): whether implemente publish action or not, argument for `upload_file`
         """
         # create a draft deposition
-        url_action = self._get_depositions_by_id(self.deposition_id)['links']['newversion']
+        url_action = self._get_depositions_by_id(self.deposition_id)["links"][
+            "newversion"
+        ]
         r = requests.post(url_action, auth=self._bearer_auth)
         r.raise_for_status()
 
         # parse current project to the draft deposition
-        new_dep_id = r.json()['links']['latest_draft'].split('/')[-1]
+        new_dep_id = r.json()["links"]["latest_draft"].split("/")[-1]
         self.set_project(new_dep_id)
         self.change_metadata(json_file_path="/home/akshat/zenodopy/.zenodo.json")
 
         # invoke upload funcions
         if not source:
             print("You need to supply a path")
-        
+
         if Path(source).exists():
             if Path(source).is_file():
                 self.upload_file(source, publish=publish)
             elif Path(source).is_dir():
                 if not output_file:
                     self.upload_zip(source, publish=publish)
-                elif '.zip' in ''.join(Path(output_file).suffixes).lower():
+                elif ".zip" in "".join(Path(output_file).suffixes).lower():
                     self.upload_zip(source, output_file, publish=publish)
-                elif '.tar.gz' in ''.join(Path(output_file).suffixes).lower():
+                elif ".tar.gz" in "".join(Path(output_file).suffixes).lower():
                     self.upload_tar(source, output_file, publish=publish)
         else:
             raise FileNotFoundError(f"{source} does not exist")
-        
+
     def publish(self):
-        """ publish a record
-        """
-        url_action = self._get_depositions_by_id(self.deposition_id)['links']['publish']
+        """publish a record"""
+        url_action = self._get_depositions_by_id(self.deposition_id)["links"]["publish"]
         r = requests.post(url_action, auth=self._bearer_auth)
         r.raise_for_status()
         return r
@@ -696,25 +758,26 @@ class Client(object):
 
         if bucket_link is not None:
             if validate_url(bucket_link):
-                r = requests.get(f"{bucket_link}/{filename}",
-                                 auth=self._bearer_auth)
+                r = requests.get(f"{bucket_link}/{filename}", auth=self._bearer_auth)
 
                 # if dst_path is not set, set download to current directory
                 # else download to set dst_path
                 if dst_path:
                     if os.path.isdir(dst_path):
-                        filename = dst_path + '/' + filename 
+                        filename = dst_path + "/" + filename
                     else:
-                        raise FileNotFoundError(f'{dst_path} does not exist')
-                        
+                        raise FileNotFoundError(f"{dst_path} does not exist")
+
                 if r.ok:
-                    with open(filename, 'wb') as f:
-                        f.write(r.content)                    
+                    with open(filename, "wb") as f:
+                        f.write(r.content)
                 else:
-                    print(f" ** Something went wrong, check that {filename} is in your poject  ** ")
-                    
+                    print(
+                        f" ** Something went wrong, check that {filename} is in your poject  ** "
+                    )
+
             else:
-                print(f' ** {bucket_link}/{filename} is not a valid URL ** ')
+                print(f" ** {bucket_link}/{filename} is not a valid URL ** ")
 
     def _is_doi(self, string=None):
         """test if string is of the form of a zenodo doi
@@ -727,6 +790,7 @@ class Client(object):
            bool: true is string is doi-like
         """
         import re
+
         pattern = re.compile("10.5281/zenodo.[0-9]+")
         return pattern.match(string)
 
@@ -739,7 +803,7 @@ class Client(object):
         Returns:
             str: the record id from the doi (just the last numbers)
         """
-        return doi.split('.')[-1]
+        return doi.split(".")[-1]
 
     def get_urls_from_doi(self, doi=None):
         """the files urls for the given doi
@@ -756,12 +820,14 @@ class Client(object):
             print(f"{doi} must be of the form: 10.5281/zenodo.[0-9]+")
 
         # get request (do not need to provide access token since public
-        r = requests.get(f"https://zenodo.org/api/records/{record_id}")  # params={'access_token': ACCESS_TOKEN})
-        return [f['links']['self'] for f in r.json()['files']]
+        r = requests.get(
+            f"https://zenodo.org/api/records/{record_id}"
+        )  # params={'access_token': ACCESS_TOKEN})
+        return [f["links"]["self"] for f in r.json()["files"]]
 
     def _get_latest_record(self, record_id=None):
         """return the latest record id for given record id
-        
+
         Args:
             record_id (str or int): the record id you known. Defaults to None.
 
@@ -769,9 +835,11 @@ class Client(object):
             str: the latest record id or 'None' if not found
         """
         try:
-            record = self._get_depositions_by_id(record_id)['links']['latest'].split('/')[-1]
+            record = self._get_depositions_by_id(record_id)["links"]["latest"].split(
+                "/"
+            )[-1]
         except:
-            record = 'None'
+            record = "None"
         return record
 
     def delete_file(self, filename=None):
@@ -783,8 +851,7 @@ class Client(object):
         bucket_link = self.bucket
 
         # with open(file_path, "rb") as fp:
-        _ = requests.delete(f"{bucket_link}/{filename}",
-                            auth=self._bearer_auth)
+        _ = requests.delete(f"{bucket_link}/{filename}", auth=self._bearer_auth)
 
     def _delete_project(self, dep_id=None):
         """delete a project from repository by ID
@@ -792,11 +859,12 @@ class Client(object):
         Args:
             dep_id (str): The project deposition ID
         """
-        print('')
+        print("")
         # if input("are you sure you want to delete this project? (y/n)") == "y":
         # delete requests, we are deleting the resource at the specified URL
-        r = requests.delete(f'{self._endpoint}/deposit/depositions/{dep_id}',
-                            auth=self._bearer_auth)
+        r = requests.delete(
+            f"{self._endpoint}/deposit/depositions/{dep_id}", auth=self._bearer_auth
+        )
         # response status
         print(r.status_code)
 
