@@ -5,7 +5,7 @@ zeno = zenodopy.Client(sandbox=True)
 
 # zeno.list_projects
 
-zeno.create_project(title="twoversion10", upload_type="other")
+zeno.create_project(title="twoversion11", upload_type="other")
 
 
 # upload file to zenodo
