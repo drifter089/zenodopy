@@ -6,9 +6,9 @@ zeno = zenodopy.Client(sandbox=True)
 # zeno.list_projects
 
 zeno.create_project(
-    title="twoversion11",
+    title="twoversionci",
     upload_type="other",
-    metadata_json="/home/akshat/zenodopy/.zenodo.json",
+    metadata_json=".zenodo.json",
 )
 
 
@@ -17,7 +17,7 @@ zeno.upload_file("test.file.txt", publish=True)
 zeno.update(
     source="/home/akshat/zenodopy",
     publish=True,
-    metadata_json="/home/akshat/zenodopy/.zenodo.json",
+    metadata_json=".zenodo.json",
 )
 # zeno.list_files()
 # zeno.upload_file("test.file.txt",publish=True)
