@@ -374,7 +374,9 @@ class Client(object):
             # except UserWarning:
             # warnings.warn("The object is not pointing to a project. Either create a project or explicity set the project'", UserWarning)
 
-    def create_project(self, title=None, upload_type=None, description=None):
+    def create_project(
+        self, title=None, upload_type=None, metadata_json=None, description=None
+    ):
         """Creates a new project
 
         After a project is creates the zenodopy object
@@ -404,7 +406,7 @@ class Client(object):
             self.title = title
 
             self.change_metadata(
-                json_file_path="/home/akshat/zenodopy/.zenodo.json",
+                json_file_path=metadata_json,
             )
 
         else:
@@ -630,7 +632,7 @@ class Client(object):
         # remove tar file after uploading it
         os.remove(output_file)
 
-    def update(self, source=None, output_file=None, publish=False):
+    def update(self, source=None, output_file=None, metadata_json=None, publish=False):
         """update an existed record
 
         Args:
@@ -649,7 +651,7 @@ class Client(object):
         # parse current project to the draft deposition
         new_dep_id = r.json()["links"]["latest_draft"].split("/")[-1]
         self.set_project(new_dep_id)
-        self.change_metadata(json_file_path="/home/akshat/zenodopy/.zenodo.json")
+        self.change_metadata(json_file_path=metadata_json)
 
         # invoke upload funcions
         if not source:
