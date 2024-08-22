@@ -419,13 +419,25 @@ class Client(object):
         projects = self._get_depositions()
 
         if projects is not None:
-            project_list = [d for d in projects if d["id"] == int(dep_id)]
+            project_list = [
+                d
+                for d in projects
+                if self._check_parent_doi(dep_id=dep_id, project_obj=d)
+            ]
             if len(project_list) > 0:
                 self.title = project_list[0]["title"]
-                self.bucket = self._get_bucket_by_id(dep_id)
-                self.deposition_id = dep_id
+                self.bucket = self._get_bucket_by_id(project_list[0]["id"])
+                self.deposition_id = project_list[0]["id"]
         else:
             print(f" ** Deposition ID: {dep_id} does not exist in your projects  ** ")
+
+    def _check_parent_doi(self, dep_id, project_obj):
+        if project_obj["id"] == int(dep_id):
+            return True
+        concept_doi = project_obj.get("conceptdoi", None)
+        if concept_doi != None:
+            return int(dep_id) == int(concept_doi.split(".")[-1])
+        return False
 
     def change_metadata(self, json_file_path=None):
         """change projects metadata
