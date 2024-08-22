@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "title": "test rel filellll",
+    "title": "stability test",
     "upload_type": "other",
     "description": "",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "access_right": "open",
     "license": "Apache-2.0",
     "keywords": ["zenodo", "github", "git"],
