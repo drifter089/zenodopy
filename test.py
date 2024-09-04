@@ -10,13 +10,13 @@ zeno = zenodopy.Client(sandbox=True)
 #     upload_type="other",
 #     metadata_json=".zenodo.json",
 # )
-zeno.set_project(dep_id=106218)
+zeno.set_project(dep_id=106283)
 
 
 # upload file to zenodo
 # zeno.upload_file("test.file.txt", publish=True)
 zeno.update(
-    source="/home/akshat/zenodopy",
+    source="/home/akshat/PyPSA",
     publish=True,
     metadata_json=".zenodo.json",
 )

@@ -481,6 +481,9 @@ class Client(object):
         #     upload_type = "other"
 
         file_data["metadata"]["publication_date"] = datetime.now().strftime("%Y-%m-%d")
+        
+        print("=================json data==========")
+        print(file_data)
 
         r = requests.put(
             f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
@@ -492,6 +495,7 @@ class Client(object):
         if r.ok:
             return r.json()
         else:
+            print(r.json())
             return r.raise_for_status()
 
     def upload_file(self, file_path=None, publish=False):
@@ -670,6 +674,8 @@ class Client(object):
 
         # parse current project to the draft deposition
         new_dep_id = r.json()["links"]["latest_draft"].split("/")[-1]
+        print("----------------new-----")
+        print(new_dep_id)
         self.set_project(new_dep_id)
         self.change_metadata(json_file_path=metadata_json)
 
