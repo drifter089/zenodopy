@@ -418,6 +418,8 @@ class Client(object):
         """set the project by id"""
         projects = self._get_depositions()
 
+        print("==================set function===============")
+
         if projects is not None:
             project_list = [
                 d
@@ -427,7 +429,10 @@ class Client(object):
             if len(project_list) > 0:
                 self.title = project_list[0]["title"]
                 self.bucket = self._get_bucket_by_id(project_list[0]["id"])
+                print(self.deposition_id)
                 self.deposition_id = project_list[0]["id"]
+                print(self.deposition_id)
+
         else:
             print(f" ** Deposition ID: {dep_id} does not exist in your projects  ** ")
 
@@ -481,7 +486,7 @@ class Client(object):
         #     upload_type = "other"
 
         file_data["metadata"]["publication_date"] = datetime.now().strftime("%Y-%m-%d")
-        
+
         print("=================json data==========")
         print(file_data)
 
