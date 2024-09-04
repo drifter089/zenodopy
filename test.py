@@ -10,7 +10,7 @@ zeno = zenodopy.Client(sandbox=True)
 #     upload_type="other",
 #     metadata_json=".zenodo.json",
 # )
-zeno.set_project(dep_id=102296)
+zeno.set_project(dep_id=106218)
 
 
 # upload file to zenodo
