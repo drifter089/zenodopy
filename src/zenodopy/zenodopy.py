@@ -675,6 +675,9 @@ class Client(object):
         url_action = self._get_depositions_by_id(self.deposition_id)["links"][
             "newversion"
         ]
+        
+        time.sleep(5)
+        
         r = requests.post(url_action, auth=self._bearer_auth)
         r.raise_for_status()
 
