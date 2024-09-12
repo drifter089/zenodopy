@@ -510,7 +510,7 @@ class Client(object):
 
             time.sleep(5)  
 
-            raise Exception(f"Request failed after {retries} attempts")
+        raise Exception(f"Request failed after {5} attempts")
 
     def upload_file(self, file_path=None, publish=False):
         """upload a file to a project
