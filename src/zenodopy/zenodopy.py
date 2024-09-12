@@ -491,18 +491,26 @@ class Client(object):
         print("=================json data==========")
         print(file_data)
 
-        r = requests.put(
-            f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
-            auth=self._bearer_auth,
-            data=json.dumps(file_data),
-            headers={"Content-Type": "application/json"},
-        )
+       for attempt in range(5):
+        try:
+            r = requests.put(
+                f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
+                auth=self._bearer_auth,
+                data=json.dumps(file_data),
+                headers={"Content-Type": "application/json"},
+            )
 
-        if r.ok:
-            return r.json()
-        else:
-            print(r.json())
-            return r.raise_for_status()
+            if r.ok:
+                return r.json()
+            else:
+                print(f"Attempt {attempt + 1} failed with status code: {r.status_code}")
+                print(r.json())
+        except requests.exceptions.RequestException as e:
+            print(f"Attempt {attempt + 1} failed with error: {e}")
+
+        time.sleep(delay)  # Delay before retrying
+
+    raise Exception(f"Request failed after {retries} attempts")
 
     def upload_file(self, file_path=None, publish=False):
         """upload a file to a project
