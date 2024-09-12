@@ -1,7 +1,8 @@
 import zenodopy
 
 # always start by creating a Client object
-zeno = zenodopy.Client(sandbox=True)
+zeno = zenodopy.Client(sandbox=True, token="CNXNk6GBg0dQUvZJsCUEajG4ZZnAr8YUrWPR9oCucnu8vq39jFJDUGoYW6WK"
+)
 
 # zeno.list_projects
 
@@ -10,13 +11,13 @@ zeno = zenodopy.Client(sandbox=True)
 #     upload_type="other",
 #     metadata_json=".zenodo.json",
 # )
-zeno.set_project(dep_id=106283)
+zeno.set_project(dep_id=106299)
 
 
 # upload file to zenodo
 # zeno.upload_file("test.file.txt", publish=True)
 zeno.update(
-    source="/home/akshat/PyPSA",
+    source="/home/akshat/PyPSA/README.md",
     publish=True,
     metadata_json=".zenodo.json",
 )

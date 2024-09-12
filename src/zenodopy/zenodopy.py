@@ -7,6 +7,7 @@ import warnings
 import tarfile
 import zipfile
 from datetime import datetime
+import time
 
 
 def validate_url(url):
@@ -682,6 +683,9 @@ class Client(object):
         print("----------------new-----")
         print(new_dep_id)
         self.set_project(new_dep_id)
+        
+        time.sleep(5)
+        
         self.change_metadata(json_file_path=metadata_json)
 
         # invoke upload funcions
