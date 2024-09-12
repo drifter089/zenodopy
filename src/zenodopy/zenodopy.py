@@ -508,7 +508,7 @@ class Client(object):
             except requests.exceptions.RequestException as e:
                 print(f"Attempt {attempt + 1} failed with error: {e}")
 
-            time.sleep(delay)  # Delay before retrying
+            time.sleep(5)  
 
             raise Exception(f"Request failed after {retries} attempts")
 
