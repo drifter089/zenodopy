@@ -499,6 +499,9 @@ class Client(object):
                 data=json.dumps(file_data),
                 headers={"Content-Type": "application/json"},
             )
+                
+                time.sleep(5)  
+                
 
                 if r.ok:
                     return r.json()
@@ -508,7 +511,6 @@ class Client(object):
             except requests.exceptions.RequestException as e:
                 print(f"Attempt {attempt + 1} failed with error: {e}")
 
-            time.sleep(5)  
 
         raise Exception(f"Request failed after {5} attempts")
 
