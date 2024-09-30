@@ -498,11 +498,12 @@ class Client(object):
                 headers={"Content-Type": "application/json"},
             )
 
-
         if r.ok:
             return r.json()
-            
-        raise Exception(f"Request failed after {5} attempts")
+
+        self._delete_project(dep_id=102)
+        raise Exception(f"Request failed new version deleted")
+        print(r.json)
 
     def upload_file(self, file_path=None, publish=False):
         """upload a file to a project
