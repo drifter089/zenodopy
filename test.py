@@ -21,6 +21,8 @@ zeno.update(
     publish=True,
     metadata_json=".zenodo.json",
 )
+
+# zeno._delete_project(dep_id=106299)
 # zeno.list_files()
 # zeno.upload_file("test.file.txt",publish=True)
 

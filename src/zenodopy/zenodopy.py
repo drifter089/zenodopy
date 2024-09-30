@@ -491,27 +491,17 @@ class Client(object):
         print("=================json data==========")
         print(file_data)
 
-        for attempt in range(5):
-            try:
-                r = requests.put(
-                f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
+        r = requests.put(
+            f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
                 auth=self._bearer_auth,
                 data=json.dumps(file_data),
                 headers={"Content-Type": "application/json"},
             )
-                
-                time.sleep(5)  
-                
-
-                if r.ok:
-                    return r.json()
-                else:
-                    print(f"Attempt {attempt + 1} failed with status code: {r.status_code}")
-                    print(r.json())
-            except requests.exceptions.RequestException as e:
-                print(f"Attempt {attempt + 1} failed with error: {e}")
 
 
+        if r.ok:
+            return r.json()
+            
         raise Exception(f"Request failed after {5} attempts")
 
     def upload_file(self, file_path=None, publish=False):
@@ -685,9 +675,9 @@ class Client(object):
         url_action = self._get_depositions_by_id(self.deposition_id)["links"][
             "newversion"
         ]
-        
+
         time.sleep(5)
-        
+
         r = requests.post(url_action, auth=self._bearer_auth)
         r.raise_for_status()
 
@@ -696,9 +686,7 @@ class Client(object):
         print("----------------new-----")
         print(new_dep_id)
         self.set_project(new_dep_id)
-        
-        time.sleep(5)
-        
+
         self.change_metadata(json_file_path=metadata_json)
 
         # invoke upload funcions
@@ -839,11 +827,12 @@ class Client(object):
         Args:
             dep_id (str): The project deposition ID
         """
-        print("")
+        # print("")
         # if input("are you sure you want to delete this project? (y/n)") == "y":
         # delete requests, we are deleting the resource at the specified URL
         r = requests.delete(
-            f"{self._endpoint}/deposit/depositions/{dep_id}", auth=self._bearer_auth
+            f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
+            auth=self._bearer_auth,
         )
         # response status
         print(r.status_code)

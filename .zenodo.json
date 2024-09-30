@@ -3,7 +3,7 @@
     "title": "stability test",
     "upload_type": "other",
     "description": "",
-    "version": "0.8.0",
+    "version": "0.9.0",
     "access_right": "open",
     "license": "Apache-2.0",
     "keywords": ["zenodo", "github", "git"],
