@@ -501,7 +501,6 @@ class Client(object):
         if r.ok:
             return r.json()
 
-        self._delete_project(dep_id=102)
         raise Exception(f"Request failed new version deleted")
         print(r.json)
 

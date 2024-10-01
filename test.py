@@ -16,13 +16,13 @@ zeno.set_project(dep_id=106299)
 
 # upload file to zenodo
 # zeno.upload_file("test.file.txt", publish=True)
-zeno.update(
-    source="/home/akshat/PyPSA/README.md",
-    publish=True,
-    metadata_json=".zenodo.json",
-)
+# zeno.update(
+#     source="/home/akshat/PyPSA/README.md",
+#     publish=True,
+#     metadata_json=".zenodo.json",
+# )
 
-# zeno._delete_project(dep_id=106299)
+zeno._delete_project(dep_id=106299)
 # zeno.list_files()
 # zeno.upload_file("test.file.txt",publish=True)
 
