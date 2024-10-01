@@ -727,8 +727,8 @@ class Client(object):
                     # After 5 attempts, re-raise the exception
                     raise
                 # Optionally, you can add a delay before retrying
-                self.set_project(dep_id=106299)
-                time.sleep(1)
+                time.sleep(4)
+                self.set_project(dep_id=dep_id)
         
         
         
