@@ -488,21 +488,19 @@ class Client(object):
 
         file_data["metadata"]["publication_date"] = datetime.now().strftime("%Y-%m-%d")
 
-        print("=================json data==========")
-        print(file_data)
-
         r = requests.put(
             f"{self._endpoint}/deposit/depositions/{self.deposition_id}",
-                auth=self._bearer_auth,
-                data=json.dumps(file_data),
-                headers={"Content-Type": "application/json"},
-            )
+            auth=self._bearer_auth,
+            data=json.dumps(file_data),
+            headers={"Content-Type": "application/json"},
+        )
 
         if r.ok:
             return r.json()
-
-        print(r.json)
-        raise Exception(f"Request failed new version deleted")
+        
+        else:
+            return r.raise_for_status()
+        
 
     def upload_file(self, file_path=None, publish=False):
         """upload a file to a project
@@ -684,20 +682,10 @@ class Client(object):
         print("----------------new-----")
         print(new_dep_id)
         self.set_project(new_dep_id)
-        
+
         time.sleep(5)
 
-        try:
-            self.change_metadata(json_file_path=metadata_json)
-        except Exception as e:
-            print(f"An error occurred in change_metadata: {e}")
-            # Delete the project
-            self._delete_project(
-                dep_id=new_dep_id
-            )  # Assuming you have a method to delete the project
-            # Optionally, re-raise the exception if you want to halt execution
-            raise
-
+        self.change_metadata(json_file_path=metadata_json)
         # invoke upload funcions
         if not source:
             print("You need to supply a path")
@@ -715,12 +703,12 @@ class Client(object):
         else:
             raise FileNotFoundError(f"{source} does not exist")
 
-
-    def rollback_retry(self,dep_id=None, source=None, metadata_json=None, publish=False):
+    def rollback_retry(
+        self, dep_id=None, source=None, metadata_json=None, publish=False
+    ):
         for attempt in range(5):
             try:
-                self.update(source=source,metadata_json=metadata_json,
-                publish=publish)
+                self.update(source=source, metadata_json=metadata_json, publish=publish)
                 break  # Exit the loop if update is successful
             except Exception as e:
                 if attempt == 4:
@@ -729,9 +717,6 @@ class Client(object):
                 # Optionally, you can add a delay before retrying
                 time.sleep(4)
                 self.set_project(dep_id=dep_id)
-        
-        
-        
 
     def publish(self):
         """publish a record"""
