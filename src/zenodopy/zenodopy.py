@@ -501,8 +501,8 @@ class Client(object):
         if r.ok:
             return r.json()
 
-        raise Exception(f"Request failed new version deleted")
         print(r.json)
+        raise Exception(f"Request failed new version deleted")
 
     def upload_file(self, file_path=None, publish=False):
         """upload a file to a project
@@ -676,8 +676,6 @@ class Client(object):
             "newversion"
         ]
 
-        time.sleep(5)
-
         r = requests.post(url_action, auth=self._bearer_auth)
         r.raise_for_status()
 
@@ -686,8 +684,19 @@ class Client(object):
         print("----------------new-----")
         print(new_dep_id)
         self.set_project(new_dep_id)
+        
+        time.sleep(5)
 
-        self.change_metadata(json_file_path=metadata_json)
+        try:
+            self.change_metadata(json_file_path=metadata_json)
+        except Exception as e:
+            print(f"An error occurred in change_metadata: {e}")
+            # Delete the project
+            self._delete_project(
+                dep_id=new_dep_id
+            )  # Assuming you have a method to delete the project
+            # Optionally, re-raise the exception if you want to halt execution
+            raise
 
         # invoke upload funcions
         if not source:
@@ -705,6 +714,24 @@ class Client(object):
                     self.upload_tar(source, output_file, publish=publish)
         else:
             raise FileNotFoundError(f"{source} does not exist")
+
+
+    def rollback_retry(self,dep_id=None, source=None, metadata_json=None, publish=False):
+        for attempt in range(5):
+            try:
+                self.update(source=source,metadata_json=metadata_json,
+                publish=publish)
+                break  # Exit the loop if update is successful
+            except Exception as e:
+                if attempt == 4:
+                    # After 5 attempts, re-raise the exception
+                    raise
+                # Optionally, you can add a delay before retrying
+                self.set_project(dep_id=106299)
+                time.sleep(1)
+        
+        
+        
 
     def publish(self):
         """publish a record"""
