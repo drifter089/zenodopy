@@ -681,6 +681,9 @@ class Client(object):
         new_dep_id = r.json()["links"]["latest_draft"].split("/")[-1]
         print("----------------new-----")
         print(new_dep_id)
+        
+        time.sleep(2)
+        
         self.set_project(new_dep_id)
 
         time.sleep(5)
